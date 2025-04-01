@@ -1,35 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import EditableTable from './components/EditableTable';
+import SummaryBar from './components/SummaryBar';
+import FilterBar from './components/FilterBar';
+import ThemeToggle from './components/ThemeToggle';
+import './styles/app.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [data, setData] = useLocalStorage('gastiador-data', [{ name: '', category: '', amount: '' }]);
+  const [filter, setFilter] = useState('');
+  const [theme, setTheme] = useLocalStorage('gastiador-theme', 'light');
+
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
+  const clearAll = () => setData([{ name: '', category: '', amount: '' }]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <div className="app-header">
+        <h1>💸 Gastiador</h1>
+        <ThemeToggle theme={theme} setTheme={setTheme} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <FilterBar filter={filter} setFilter={setFilter} clearAll={clearAll} />
+      <EditableTable data={data} setData={setData} filter={filter} />
+      <SummaryBar data={data} />
+    </div>
+  );
 }
-
-export default App
